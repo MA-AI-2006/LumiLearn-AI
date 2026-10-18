@@ -126,7 +126,15 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ navigate, initialNoteI
       setConversations(conversations.map((c) => (c.id === finalConv.id ? finalConv : c)));
       await storage.saveTutorConversation(finalConv);
     } catch (err: any) {
-      alert('Tutor connection error: ' + err.message);
+      console.error('Tutor connection error:', err);
+      const errMsg: TutorMessage = {
+        id: 'msg-err-' + Date.now(),
+        role: 'assistant',
+        content: `⚠️ **Unable to connect to AI Tutor**: ${err.message || 'An unexpected error occurred.'}`,
+        suggestedFollowUps: ['Retry asking your question'],
+        timestamp: new Date().toISOString()
+      };
+      setConversations(conversations.map((c) => (c.id === updatedConv.id ? { ...updatedConv, messages: [...updatedMessages, errMsg] } : c)));
     } finally {
       setLoading(false);
     }
@@ -156,7 +164,6 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ navigate, initialNoteI
       updatedAt: new Date().toISOString()
     };
     await storage.saveNote(newNote);
-    alert('Saved as a new note in your library!');
     navigate('note-editor', { id: newNote.id });
   };
 

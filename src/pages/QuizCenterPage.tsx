@@ -10,7 +10,8 @@ import {
   BarChart,
   Trash2,
   Filter,
-  ArrowRight
+  ArrowRight,
+  AlertCircle
 } from 'lucide-react';
 import { storage } from '../services/storage';
 import { Quiz, NoteDocument, AcademicLevel } from '../types';
@@ -31,6 +32,7 @@ export const QuizCenterPage: React.FC<QuizCenterPageProps> = ({ navigate }) => {
   const [questionCount, setQuestionCount] = useState(5);
   const [difficulty, setDifficulty] = useState<AcademicLevel>('intermediate');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -53,6 +55,7 @@ export const QuizCenterPage: React.FC<QuizCenterPageProps> = ({ navigate }) => {
 
     setIsGenerating(true);
     try {
+      setModalError(null);
       const data = await postApiJson<any>('/api/generate-quiz', {
         sourceTitle: sourceNote.title,
         sourceContent: sourceNote.overview + '\n' + sourceNote.sections.map((s) => s.content).join('\n'),
@@ -67,7 +70,8 @@ export const QuizCenterPage: React.FC<QuizCenterPageProps> = ({ navigate }) => {
       setShowCreateModal(false);
       navigate('quiz-runner', { id: data.id });
     } catch (err: any) {
-      alert('Failed to generate quiz: ' + err.message);
+      console.error('Quiz generation error:', err);
+      setModalError(err.message || 'Failed to generate quiz.');
     } finally {
       setIsGenerating(false);
     }
@@ -201,6 +205,13 @@ export const QuizCenterPage: React.FC<QuizCenterPageProps> = ({ navigate }) => {
                   </select>
                 </div>
               </div>
+
+              {modalError && (
+                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                  <span>{modalError}</span>
+                </div>
+              )}
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#EBE6DF]">
                 <button

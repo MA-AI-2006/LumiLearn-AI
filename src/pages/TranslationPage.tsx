@@ -9,7 +9,8 @@ import {
   BookOpen,
   Sparkles,
   FileText,
-  Calculator
+  Calculator,
+  AlertCircle
 } from 'lucide-react';
 import { storage } from '../services/storage';
 import { NoteDocument, TranslationResource } from '../types';
@@ -33,6 +34,7 @@ export const TranslationPage: React.FC<TranslationPageProps> = ({
   const [viewMode, setViewMode] = useState<'side' | 'translated'>('side');
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [translationError, setTranslationError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -51,6 +53,7 @@ export const TranslationPage: React.FC<TranslationPageProps> = ({
   const handleTranslate = async () => {
     if (!activeNote) return;
     setIsTranslating(true);
+    setTranslationError(null);
     try {
       const data = await postApiJson<any>('/api/translate-note', {
         note: activeNote,
@@ -60,7 +63,8 @@ export const TranslationPage: React.FC<TranslationPageProps> = ({
       setTranslationResult(data);
       await storage.saveTranslation(data);
     } catch (err: any) {
-      alert('Translation failed: ' + err.message);
+      console.error('Translation failed:', err);
+      setTranslationError(err.message || 'Translation failed.');
     } finally {
       setIsTranslating(false);
     }
@@ -90,7 +94,6 @@ export const TranslationPage: React.FC<TranslationPageProps> = ({
     };
 
     await storage.saveNote(newTranslatedNote);
-    alert(`Saved as a separate ${targetLanguage} document in your notes library!`);
     navigate('note-editor', { id: newTranslatedNote.id });
   };
 
@@ -109,6 +112,13 @@ export const TranslationPage: React.FC<TranslationPageProps> = ({
           symbol corruption.
         </p>
       </div>
+
+      {translationError && (
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2.5">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <span>{translationError}</span>
+        </div>
+      )}
 
       {/* Selector Controls Bar */}
       <div className="bg-white p-5 rounded-3xl border border-[#EBE6DF] shadow-xs flex flex-wrap items-center justify-between gap-4">

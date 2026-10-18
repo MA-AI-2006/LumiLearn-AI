@@ -141,7 +141,6 @@ export const QuizRunnerPage: React.FC<QuizRunnerPageProps> = ({ quizId, navigate
     };
 
     await storage.saveFlashcardDeck(mistakeDeck);
-    alert('Flashcard deck created from your mistakes! Heading to Flashcards.');
     navigate('flashcards');
   };
 

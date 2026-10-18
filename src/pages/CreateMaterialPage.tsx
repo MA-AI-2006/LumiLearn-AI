@@ -629,9 +629,18 @@ Work is defined as W = F * d * cos(theta). The Work-Energy Theorem states that n
 
         {/* Error notification */}
         {errorMessage && (
-          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-            <span>{errorMessage}</span>
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 space-y-2">
+            <div className="flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <span className="font-semibold leading-relaxed">{errorMessage}</span>
+            </div>
+            {errorMessage.includes('Vercel') && (
+              <div className="ml-6 pl-2.5 border-l-2 border-rose-300 text-[11px] text-rose-700 space-y-1 pt-0.5">
+                <p className="font-bold text-rose-900">Why this happens after adding the key:</p>
+                <p>• In Vercel, adding an Environment Variable under <em>Settings</em> <strong>does not automatically update active deployments</strong>.</p>
+                <p>• Go to your Vercel Dashboard → <strong>Deployments</strong> tab → click the three dots (<span className="font-mono font-bold">...</span>) next to your deployment → click <strong className="underline">Redeploy</strong>.</p>
+              </div>
+            )}
           </div>
         )}
 
