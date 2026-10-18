@@ -735,9 +735,16 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`LumiLearn AI server running at http://0.0.0.0:${PORT}`);
-  });
+  // Only start listening when not running as a Vercel serverless function
+  if (!process.env.VERCEL) {
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`LumiLearn AI server running at http://0.0.0.0:${PORT}`);
+    });
+  }
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;

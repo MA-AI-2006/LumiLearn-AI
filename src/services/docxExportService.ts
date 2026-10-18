@@ -468,8 +468,7 @@ export async function exportNoteToDocx(note: NoteDocument): Promise<void> {
         docChildren.push(
           new Paragraph({
             children: parseMarkdownToRuns(trimmed),
-            spacing: { after: 120 },
-            lineSpacing: 276
+            spacing: { after: 120, line: 276 }
           })
         );
       }
