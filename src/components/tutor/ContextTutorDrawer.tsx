@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { MathRenderer } from '../common/MathRenderer';
 import { NoteDocument } from '../../types';
+import { postApiJson } from '../../utils/apiClient';
 
 interface ContextTutorDrawerProps {
   isOpen: boolean;
@@ -57,18 +58,12 @@ export const ContextTutorDrawer: React.FC<ContextTutorDrawerProps> = ({
     setLoading(true);
 
     try {
-      const res = await fetch('/api/ai-tutor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: userText,
-          conversationHistory: newMessages,
-          explanationLevel: level,
-          contextDocument: activeDocument
-        })
+      const data = await postApiJson<any>('/api/ai-tutor', {
+        message: userText,
+        conversationHistory: newMessages,
+        explanationLevel: level,
+        contextDocument: activeDocument
       });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
 
       setMessages([
         ...newMessages,

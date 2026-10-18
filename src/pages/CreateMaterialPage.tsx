@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { storage } from '../services/storage';
 import { NoteDetailLevel, AcademicLevel, SourceMaterial } from '../types';
+import { postApiJson } from '../utils/apiClient';
 
 interface CreateMaterialPageProps {
   navigate: (route: string, params?: any) => void;
@@ -159,27 +160,17 @@ Work is defined as W = F * d * cos(theta). The Work-Energy Theorem states that n
 
       // Step 2: Call server-side Gemini note generation
       setProcessingStep('AI analyzing pedagogical structure & mathematical notation...');
-      const response = await fetch('/api/generate-notes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sourceTitle: effectiveTitle,
-          sourceContent: effectiveContent,
-          detailLevel,
-          academicLevel,
-          language,
-          includeFormulas,
-          includeDefinitions,
-          includeExamples
-        })
+      const generatedNote = await postApiJson<any>('/api/generate-notes', {
+        sourceTitle: effectiveTitle,
+        sourceContent: effectiveContent,
+        detailLevel,
+        academicLevel,
+        language,
+        includeFormulas,
+        includeDefinitions,
+        includeExamples
       });
 
-      if (!response.ok) {
-        const errJson = await response.json();
-        throw new Error(errJson.error || 'Failed to generate study notes from server.');
-      }
-
-      const generatedNote = await response.json();
       generatedNote.sourceId = sourceRecord.id;
       generatedNote.sourceTitle = sourceRecord.title;
       await storage.saveNote(generatedNote);
@@ -188,23 +179,16 @@ Work is defined as W = F * d * cos(theta). The Work-Energy Theorem states that n
       if (generateQuiz) {
         setProcessingStep('Generating interactive quiz assessment...');
         try {
-          const quizRes = await fetch('/api/generate-quiz', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              sourceTitle: effectiveTitle,
-              sourceContent: effectiveContent,
-              questionCount: 4,
-              difficulty: academicLevel,
-              language
-            })
+          const quizData = await postApiJson<any>('/api/generate-quiz', {
+            sourceTitle: effectiveTitle,
+            sourceContent: effectiveContent,
+            questionCount: 4,
+            difficulty: academicLevel,
+            language
           });
-          if (quizRes.ok) {
-            const quizData = await quizRes.json();
-            quizData.noteId = generatedNote.id;
-            quizData.sourceId = sourceRecord.id;
-            await storage.saveQuiz(quizData);
-          }
+          quizData.noteId = generatedNote.id;
+          quizData.sourceId = sourceRecord.id;
+          await storage.saveQuiz(quizData);
         } catch (qErr) {
           console.warn('Quiz generation warning:', qErr);
         }
@@ -214,22 +198,15 @@ Work is defined as W = F * d * cos(theta). The Work-Energy Theorem states that n
       if (generateFlashcards) {
         setProcessingStep('Creating spaced repetition flashcard deck...');
         try {
-          const flashRes = await fetch('/api/generate-flashcards', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              sourceTitle: effectiveTitle,
-              sourceContent: effectiveContent,
-              cardCount: 5,
-              subject: effectiveTitle.split(':')[0] || 'General'
-            })
+          const deckData = await postApiJson<any>('/api/generate-flashcards', {
+            sourceTitle: effectiveTitle,
+            sourceContent: effectiveContent,
+            cardCount: 5,
+            subject: effectiveTitle.split(':')[0] || 'General'
           });
-          if (flashRes.ok) {
-            const deckData = await flashRes.json();
-            deckData.noteId = generatedNote.id;
-            deckData.sourceId = sourceRecord.id;
-            await storage.saveFlashcardDeck(deckData);
-          }
+          deckData.noteId = generatedNote.id;
+          deckData.sourceId = sourceRecord.id;
+          await storage.saveFlashcardDeck(deckData);
         } catch (fErr) {
           console.warn('Flashcard generation warning:', fErr);
         }

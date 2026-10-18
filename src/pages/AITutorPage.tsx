@@ -18,6 +18,7 @@ import {
 import { storage } from '../services/storage';
 import { TutorConversation, TutorMessage, NoteDocument } from '../types';
 import { MathRenderer } from '../components/common/MathRenderer';
+import { postApiJson } from '../utils/apiClient';
 
 interface AITutorPageProps {
   navigate: (route: string, params?: any) => void;
@@ -102,19 +103,12 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ navigate, initialNoteI
     try {
       const activeDoc = notes.find((n) => n.id === selectedNoteId);
 
-      const res = await fetch('/api/ai-tutor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: userText,
-          conversationHistory: updatedMessages,
-          explanationLevel: level,
-          contextDocument: activeDoc || null
-        })
+      const data = await postApiJson<any>('/api/ai-tutor', {
+        message: userText,
+        conversationHistory: updatedMessages,
+        explanationLevel: level,
+        contextDocument: activeDoc || null
       });
-
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
 
       const assistantMsg: TutorMessage = {
         id: 'msg-' + Date.now(),

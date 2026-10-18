@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { storage } from '../services/storage';
 import { Quiz, NoteDocument, AcademicLevel } from '../types';
+import { postApiJson } from '../utils/apiClient';
 
 interface QuizCenterPageProps {
   navigate: (route: string, params?: any) => void;
@@ -52,19 +53,13 @@ export const QuizCenterPage: React.FC<QuizCenterPageProps> = ({ navigate }) => {
 
     setIsGenerating(true);
     try {
-      const res = await fetch('/api/generate-quiz', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sourceTitle: sourceNote.title,
-          sourceContent: sourceNote.overview + '\n' + sourceNote.sections.map((s) => s.content).join('\n'),
-          questionCount,
-          difficulty,
-          language: sourceNote.language || 'English'
-        })
+      const data = await postApiJson<any>('/api/generate-quiz', {
+        sourceTitle: sourceNote.title,
+        sourceContent: sourceNote.overview + '\n' + sourceNote.sections.map((s) => s.content).join('\n'),
+        questionCount,
+        difficulty,
+        language: sourceNote.language || 'English'
       });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
 
       data.noteId = sourceNote.id;
       await storage.saveQuiz(data);

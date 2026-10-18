@@ -14,6 +14,7 @@ import {
 import { storage } from '../services/storage';
 import { NoteDocument, TranslationResource } from '../types';
 import { MathRenderer } from '../components/common/MathRenderer';
+import { postApiJson } from '../utils/apiClient';
 
 interface TranslationPageProps {
   navigate: (route: string, params?: any) => void;
@@ -51,16 +52,10 @@ export const TranslationPage: React.FC<TranslationPageProps> = ({
     if (!activeNote) return;
     setIsTranslating(true);
     try {
-      const res = await fetch('/api/translate-note', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          note: activeNote,
-          targetLanguage
-        })
+      const data = await postApiJson<any>('/api/translate-note', {
+        note: activeNote,
+        targetLanguage
       });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
 
       setTranslationResult(data);
       await storage.saveTranslation(data);
