@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // User profile and private workspace data
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // Notes subcollection
+      match /notes/{noteId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Source materials subcollection
+      match /sources/{sourceId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Quizzes subcollection
+      match /quizzes/{quizId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Flashcards subcollection
+      match /flashcards/{deckId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Translations subcollection
+      match /translations/{transId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Tutor conversations subcollection
+      match /tutorConversations/{convId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Default catch-all denies anything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

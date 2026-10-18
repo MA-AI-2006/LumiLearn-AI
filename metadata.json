@@ -1,0 +1,6 @@
+{
+  "name": "LumiLearn AI",
+  "description": "Premium AI Study Workspace: Transform documents, videos, and audio into structured notes, interactive quizzes, flashcards, and translated learning materials with KaTeX math rendering, an AI Tutor, and Firebase synchronization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

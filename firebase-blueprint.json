@@ -1,0 +1,89 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User preferences and profile settings",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "preferredLanguage": { "type": "string" },
+        "preferredNoteDetail": { "type": "string" },
+        "preferredQuizDifficulty": { "type": "string" },
+        "theme": { "type": "string" }
+      }
+    },
+    "NoteDocument": {
+      "title": "NoteDocument",
+      "description": "Structured study note generated from lecture or reading material",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "overview": { "type": "string" },
+        "detailLevel": { "type": "string" },
+        "academicLevel": { "type": "string" },
+        "language": { "type": "string" },
+        "summary": { "type": "string" }
+      },
+      "required": ["id", "title"]
+    },
+    "SourceMaterial": {
+      "title": "SourceMaterial",
+      "description": "Uploaded or input material such as transcripts, documents, or images",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "type": { "type": "string" }
+      },
+      "required": ["id", "title", "type"]
+    },
+    "Quiz": {
+      "title": "Quiz",
+      "description": "Generated active-recall quiz",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" }
+      },
+      "required": ["id", "title"]
+    },
+    "FlashcardDeck": {
+      "title": "FlashcardDeck",
+      "description": "Flashcard study deck",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" }
+      },
+      "required": ["id", "title"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User preferences and profile document"
+    },
+    "/users/{userId}/notes/{noteId}": {
+      "schema": "NoteDocument",
+      "description": "User generated study notes"
+    },
+    "/users/{userId}/sources/{sourceId}": {
+      "schema": "SourceMaterial",
+      "description": "User input and uploaded sources"
+    },
+    "/users/{userId}/quizzes/{quizId}": {
+      "schema": "Quiz",
+      "description": "User quizzes"
+    },
+    "/users/{userId}/flashcards/{deckId}": {
+      "schema": "FlashcardDeck",
+      "description": "User flashcard decks"
+    }
+  }
+}
