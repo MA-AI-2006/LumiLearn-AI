@@ -13,6 +13,7 @@ import {
 } from "firebase/auth";
 import {
   getFirestore,
+  initializeFirestore,
   doc,
   setDoc,
   getDoc,
@@ -35,7 +36,14 @@ export const firebaseConfig = {
 // Initialize Firebase safely
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+let firestore;
+try {
+  firestore = initializeFirestore(app, { ignoreUndefinedProperties: true });
+} catch {
+  // Already initialized (e.g. during hot reload), reuse the existing instance
+  firestore = getFirestore(app);
+}
+export const db = firestore;
 
 // Authentication helper exports
 export {
